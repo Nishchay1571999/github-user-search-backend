@@ -12,8 +12,9 @@ export default function handler(
   const octokit = new Octokit();
   let data:any = {}
   if(url){
-    const {searchParams} = new URL(url , "http://"+req.headers.host)
-    const username = searchParams.get("userid")
+  const {searchParams} = new URL(url , "http://"+req.headers.host)
+  const username = searchParams.get("userid")
+  if(username){
     octokit.rest.users.getByUsername({username:username}).then((response)=>{
       res.status(200).json({date:response.data})
     })
@@ -22,5 +23,8 @@ export default function handler(
       data =  response.data
       res.status(200).json(data)  
     })
+  }
+  }else {
+    res.send(404)
   }
 }

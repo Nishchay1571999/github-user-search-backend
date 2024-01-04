@@ -11,8 +11,20 @@ export default function handler(
 ) {
   const {url} = req
   const octokit = new Octokit();
-  let data:ProfileResponse = {}
-  const {searchParams} = url && new URL(url , `http://${req.headers.host}`)
+  let data:ProfileResponse = {
+    name:null,
+    bio:null,
+    company:null,
+    blog:null,
+    location:null,
+    email:null,
+    avatar_url:null,
+    login:null,
+    followers:null,
+    following:null,
+  }
+  if(url){
+  const {searchParams} = new URL(url , `http://${req.headers.host}`)
   const username = searchParams.get("userid")
   console.log(username)
   if(username){
@@ -56,6 +68,12 @@ export default function handler(
     res.status(400).json({
       message:"UserID Field requirerd"
     })
+  }
+  }else {
+    res.status(400).json({
+      message:"UserID Field requirerd"
+    })
+
   }
 
 }

@@ -11,18 +11,51 @@ export default function handler(
 ) {
   const {url} = req
   const octokit = new Octokit();
-  let data:any = {}
-  if(url){
-    const {searchParams} = new URL(url , "http://"+req.headers.host)
-    const username = searchParams.get("userid")
+  let data:ProfileResponse = {}
+  const {searchParams} = url && new URL(url , `http://${req.headers.host}`)
+  const username = searchParams.get("userid")
+  console.log(username)
+  if(username){
+    let followers:Array<Followers> = []
+    let following:Array<Followers> = []
+
     octokit.rest.users.getByUsername({username:username}).then((response)=>{
-      data = response.data
+      octokit.rest.users.listFollowersForUser({username:username}).then((followerArray)=>{
+        followers = followerArray.data.map((item)=>{
+          return {
+            login:item.login,
+            avatar_url:item.avatar_url,
+            type:item.type
+          }
+        })
+        octokit.rest.users.listFollowingForUser({username:username}).then((followingArray)=>{
+          following = followingArray.data.map((item)=>{
+            return {
+              login:item.login,
+              avatar_url:item.avatar_url,
+              type:item.type
+            }
+          })
+          data = {
+            name:response.data.name,
+            company: response.data.company,
+            blog:response.data.blog,
+            bio:response.data.bio,
+            location:response.data.location,
+            email:response.data.email,
+            avatar_url:response.data.avatar_url,
+            login:response.data.login,
+            followers: followers,
+            following: following
+          }
+          res.status(200).json(data)
+        })
+      })
     })
   }else {
     res.status(400).json({
       message:"UserID Field requirerd"
     })
   }
-  res.status(200).json(data)
 
 }

@@ -16,7 +16,7 @@ export default function handler(
   const username = searchParams.get("userid")
   if(username){
     octokit.rest.users.getByUsername({username:username}).then((response)=>{
-      res.status(200).json({date:response.data})
+      res.status(200).json(response.data)
     })
   }else {
     octokit.rest.users.list({since:300,per_page:10}).then((response)=>{
